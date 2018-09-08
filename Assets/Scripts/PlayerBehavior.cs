@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerBehavior : MonoBehaviour {
 	public CharacterController player_controller;
@@ -14,6 +15,9 @@ public class PlayerBehavior : MonoBehaviour {
 	public int hover_duration;
 	private int hover_delta;
 	public Vector2 to_move;
+
+    private Scene scene;
+    private int hp;
 
 	public enum F_STATE{
 		GROUNDED,
@@ -48,7 +52,8 @@ public class PlayerBehavior : MonoBehaviour {
 	void Start () {
 		player_controller = GetComponent<CharacterController>();
 		fall_state = (int)F_STATE.GROUNDED;
-		
+        scene = SceneManager.GetActiveScene();
+        hp = 3;
 	}
 	
 	void FixedUpdate () {
@@ -178,8 +183,17 @@ public class PlayerBehavior : MonoBehaviour {
 	}
 	void OnTriggerEnter(Collider col){
 		if(col.gameObject.layer == 8){
-			Debug.Log("Ouch");
+            hp = --hp;
+            if (hp == 0)
+            {
+                Restart();
+            }
+			Debug.Log("Ouch" + hp);
 		}
 	}
 
+    void Restart ()
+    {
+        SceneManager.LoadScene(scene.name);
+    }
 }

@@ -191,6 +191,8 @@ MonoBehaviour:
   to_move: {x: 0, y: 0}
   fall_state: 0
   dir: 0
+  phys_dir_x: 0
+  phys_dir_y: 0
 --- !u!143 &143940067837546620
 CharacterController:
   m_ObjectHideFlags: 1
