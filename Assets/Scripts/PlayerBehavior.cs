@@ -31,6 +31,20 @@ public class PlayerBehavior : MonoBehaviour {
 	}
 	public int dir;
 
+	public enum PHYS_DIRECTION_X{
+		RIGHT = 1,
+		LEFT = -1,
+		STILL = 0
+	}
+	public int phys_dir_x;
+	public enum PHYS_DIRECTION_Y{
+		UP = 1,
+		DOWN = -1,
+		STILL = 0
+	}
+	public int phys_dir_y;
+	
+
 	void Start () {
 		player_controller = GetComponent<CharacterController>();
 		fall_state = (int)F_STATE.GROUNDED;
@@ -45,7 +59,19 @@ public class PlayerBehavior : MonoBehaviour {
 		}else if (Input.GetAxisRaw("Horizontal") < 0){
 			dir = (int)DIRECTION.LEFT;
 		}else{dir = (int)DIRECTION.STILL;}
-		
+
+		if(player_controller.velocity.x > 0){
+			phys_dir_x = (int)PHYS_DIRECTION_X.RIGHT;
+		}else if (player_controller.velocity.x < 0){
+			phys_dir_x = (int)PHYS_DIRECTION_X.LEFT;
+		}else {phys_dir_x = (int)PHYS_DIRECTION_X.STILL;}
+
+		if(player_controller.velocity.y > 0){
+			phys_dir_y = (int)PHYS_DIRECTION_Y.UP;
+		}else if (player_controller.velocity.x < 0){
+			phys_dir_y = (int)PHYS_DIRECTION_Y.DOWN;
+		}else {phys_dir_y = (int)PHYS_DIRECTION_Y.STILL;}
+
 		switch(fall_state){
 
 			case (int)F_STATE.GROUNDED:
@@ -78,22 +104,27 @@ public class PlayerBehavior : MonoBehaviour {
 			break;
 
 			case (int)F_STATE.WALLJUMP:
-				if(player_controller.isGrounded){
-					fall_state = (int)F_STATE.GROUNDED;
-				}
-				to_move = new Vector2(0,0);
+				if(walljump_dir == -dir){
+					to_move = new Vector2(0,0);
+				}else{fall_state = (int)F_STATE.FALLING;}
 				if(Input.GetButtonDown("Jump")){
 					hover_delta = hover_duration;
 					to_move = new Vector2(walljump_dist.x * walljump_dir, walljump_dist.y);
 					fall_state = (int)F_STATE.RISING;
 				}
+				if(Input.GetButtonDown("Fire3")){fall_state = (int)F_STATE.HOVERING;}
 			break;
 
 			case (int)F_STATE.HOVERING:
 
 			if(Input.GetButton("Fire3") && (hover_delta > 1)){
 				hover_delta--;
-				to_move = new Vector2(run_speed * dir, run_speed * Input.GetAxisRaw("Vertical"));
+				to_move += new Vector2(run_speed/5 * dir, run_speed/5 * Input.GetAxisRaw("Vertical"));
+				if(dir == 0){
+					to_move.x -= to_move.x / 15;
+				}
+				if(Mathf.Abs(to_move.x) > 1.5f * run_speed){to_move.x = 1.5f * run_speed * phys_dir_x;}
+				if(Mathf.Abs(to_move.y) > 1.5f * run_speed){to_move.y = 1.5f * run_speed * phys_dir_y;}
 			}else {
 				if(player_controller.isGrounded){
 					fall_state = (int)F_STATE.GROUNDED;
@@ -143,6 +174,11 @@ public class PlayerBehavior : MonoBehaviour {
 		if((player_controller.collisionFlags == CollisionFlags.Sides) && ( fall_state == (int)F_STATE.FALLING)){
 			walljump_dir = hit.normal.x;
 			fall_state = (int)F_STATE.WALLJUMP;
+		}
+	}
+	void OnTriggerEnter(Collider col){
+		if(col.gameObject.layer == 8){
+			Debug.Log("Ouch");
 		}
 	}
 
