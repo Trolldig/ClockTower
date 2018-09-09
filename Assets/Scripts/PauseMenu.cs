@@ -5,9 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour {
     public Transform canvas;
-	
-	// Update is called once per frame
-	void Update () {
+
+
+    private void Start()
+    {
+        Time.timeScale = 1;
+    }
+    // Update is called once per frame
+    void Update () {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (canvas.gameObject.activeInHierarchy == false)
