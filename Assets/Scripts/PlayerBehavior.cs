@@ -17,6 +17,7 @@ public class PlayerBehavior : MonoBehaviour {
 	public Vector2 to_move;
 
     public AudioClip damageTaken;
+    public AudioClip dead;
     private Scene scene;
     private int hp;
 
@@ -110,8 +111,8 @@ public class PlayerBehavior : MonoBehaviour {
 			break;
 
 			case (int)F_STATE.WALLJUMP:
-				if(walljump_dir == -dir){
-					to_move = new Vector2(0,0);
+                if (Mathf.Round(walljump_dir) == -dir){
+                    to_move = new Vector2(0,0);
 				}else{fall_state = (int)F_STATE.FALLING;}
 				if(Input.GetButtonDown("Jump")){
 					hover_delta = hover_duration;
@@ -197,6 +198,8 @@ public class PlayerBehavior : MonoBehaviour {
 
     void Restart ()
     {
+        GetComponent<AudioSource>().clip = dead;
+        GetComponent<AudioSource>().Play();
         SceneManager.LoadScene(scene.name);
     }
 }
