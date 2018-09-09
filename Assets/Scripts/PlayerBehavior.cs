@@ -16,6 +16,7 @@ public class PlayerBehavior : MonoBehaviour {
 	private int hover_delta;
 	public Vector2 to_move;
 
+    public AudioClip damageTaken;
     private Scene scene;
     private int hp;
 
@@ -183,6 +184,8 @@ public class PlayerBehavior : MonoBehaviour {
 	}
 	void OnTriggerEnter(Collider col){
 		if(col.gameObject.layer == 8){
+            GetComponent<AudioSource>().clip = damageTaken;
+            GetComponent<AudioSource>().Play();
             hp = --hp;
             if (hp == 0)
             {
